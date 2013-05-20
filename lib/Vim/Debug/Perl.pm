@@ -76,12 +76,17 @@ debugger uses 'n'.
 
 sub next     { 'n' }
 sub step     { 's' }
+sub stepout  { 'r' }
 sub cont     { 'c' }
+sub filelook  { "f $_[1]" }
+sub breakline { "b $_[1]" }
 sub break    { "f $_[2]", "b $_[1]" }
 sub clear    { "f $_[2]", "B $_[1]" }
 sub clearAll { 'B *' }
 sub print    { "x $_[1]" }
 sub command  { $_[1] }
+sub varView  { "y" }
+sub stackTrace { "T" }
 sub restart  { 'R' }
 sub quit     { 'q' }
 
