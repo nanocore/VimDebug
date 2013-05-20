@@ -548,11 +548,10 @@ function! s:Incantation()
       if s:fileName == ""
          throw "NoFileToDebug"
       endif
-      let args = input("Enter arguments if any: ")
          " Some day, we may do more than just Perl.
       let s:incantation = "perl -Ilib -d " . s:fileName
-      if args != ""
-         let s:incantation .= " " . args
+      if g:DBGRdebugArgs != ""
+         let s:incantation .= " " . g:DBGRdebugArgs
       endif
    catch /NoFileToDebug/
       echo "No file to debug."
