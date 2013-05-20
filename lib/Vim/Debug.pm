@@ -262,7 +262,12 @@ sub translate {
 
        if ($in =~ /^next$/            ) { @cmds = $self->next          }
     elsif ($in =~ /^step$/            ) { @cmds = $self->step          }
+    elsif ($in =~ /^stepout$/         ) { @cmds = $self->stepout       }
+    elsif ($in =~ /^varView$/         ) { @cmds = $self->varView       }
+    elsif ($in =~ /^stackTrace$/      ) { @cmds = $self->stackTrace    }
     elsif ($in =~ /^cont$/            ) { @cmds = $self->cont          }
+    elsif ($in =~ /^filelook:(.+)$/   ) { @cmds = $self->filelook($1)  }
+    elsif ($in =~ /^breakline:(.+)$/  ) { @cmds = $self->breakline($1) }
     elsif ($in =~ /^break:(\d+):(.+)$/) { @cmds = $self->break($1, $2) }
     elsif ($in =~ /^clear:(\d+):(.+)$/) { @cmds = $self->clear($1, $2) }
     elsif ($in =~ /^clearAll$/        ) { @cmds = $self->clearAll      }
