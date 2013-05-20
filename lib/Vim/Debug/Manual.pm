@@ -58,13 +58,79 @@ here, edit VimDebug.vim:
     <F7>       Step
     <F8>       Continue
 
-    <Leader>b  Set break point on the current line
+    <Leader>b  Set break point on the current line, regardless of the debugger running
+    <Leader>be Edit the file that has the saved breakpoints
     <Leader>c  Clear break point on the current line
+    <Leader>cab  Clear all break points for this debugging session
 
-    <Leader>v  Print the value of the variable under the cursor
-    <Leader>v/ Print the value of an expression thats entered
+    <Leader>v  Update the variable view (handy if you have the auto update for
+               the variables view turned off
+    <Leader>V  Toggle the auto update on the variables view
+    <Leader>f  Toggle the folding in the variables view 
+    <Leader>s  Toggle the stack trace window
+
+    <Leader>x  Print the value of the variable under the cursor
+    <Leader>x/ Print the value of an expression thats entered
 
     <Leader>/  Type a command for the debugger to execute and echo the result
+
+When running with the GUI version of vim there will be an additional menu item
+that has all the necessary debugger commands that can be used rather then the
+key mappings.  The main menu item will be named Debugger and has the following
+items as sub menu items:
+Start
+Next
+Step
+StepOut
+Continue
+ToggleStackTrace
+FoldingVariables
+Restart
+Quit
+
+Also, when using the GUI version there will be an additional icon placed on the
+toolbar that can start the debugger.  Once started it will be replaced with 
+6 icons, one for each major debugger function: step, stepout, next, continue,
+quit and restart.  Once the debugger is exited the 6 icons will be removed and
+the single debugger icon will be show once again.
+
+
+There are some global variables that you can set in your vimrc (or gvimrc) that
+can adjust some of the default functionality.   NOTE: toggles are either 1 for
+true or 0 for false
+g:DBGRshowConsole               - Toggle the showing of the console (default: 1)
+g:DBGRconsoleHeight             - Sets the console height.  The console is 
+                                  where the output from the debugger will appear
+                                 (default: 7)
+g:DBGRlineNumbers               - Toggle line numbers (default: 1)
+g:DBGRshowVarView               - Toggle showing the variables view (default: 1)
+                                  This view will show all variables and their 
+                                  values that are in the current scope.  It will
+                                  expand all hash and array variables.
+                                  (default: 1)
+g:DBGRautoUpdateVarView         - Toggle the automatic update of the variables
+                                  view.  This can slow down the stepping through
+                                  the debugger if you have lots of large variables
+                                  (default: 1)
+g:DBGRtoggleFoldingVarView      - Toggle the folding of the variables in the
+                                  variables view.  This can be useful if you have
+                                  large nested array or hash variables
+                                  (default: 1)
+g:DBGRshowStackTraceView        - Toggle the showing of the stack trace view
+                                  (default: 1)
+g:DBGRstackTraceHeight          - Sets the stack trace view height. (default: 7)
+g:DBGRautoUpdateStackTraceView  - Toggle the auto update of the stack trace view
+                                  (default: 1)
+g:DBGRsavedBreakPointsDirectory - Set the directory for the support of VimDebug. 
+                                  Currently, the only thing kept in there is the 
+                                  saved break points file.
+                                  (default: $HOME . "/.vim/vimDBGR")
+g:DBGRgeneralBreakPointsFile    - Set the file name of the file that will contain
+                                  the list of breakpoints used in all debugging 
+                                  sessions.
+                                  default: 
+                        g:DBGRsavedBreakPointsDirectory . "/.generalBreakPoints"
+
 
 =head1 Improving VimDebug
 
