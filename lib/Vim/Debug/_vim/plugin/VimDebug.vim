@@ -19,6 +19,7 @@ map <unique> <F9>          :DBGRcont<CR>                   " continue
 map <unique> <Leader>b     :DBGRsetBreakPoint<CR>
 map <unique> <Leader>be    :exec 'tabedit ' . g:DBGRgeneralBreakPointsFile<CR>
 map <unique> <Leader>v     :DBGRupdateVarView<CR>
+map <unique> <Leader>V     :DBGRtoggleAutoUpdateVarsView<CR>
 map <unique> <Leader>s     :DBGRtoggleStackTraceView<CR>
 map <unique> <Leader>f     :DBGRtoggleFoldingVarView<CR>
 map <unique> <Leader>cab   :DBGRclearAllBreakPoints<CR>
@@ -108,6 +109,7 @@ amenu &Debugger.Next\         :call DBGRnext()<CR>
 amenu &Debugger.Step\         :call DBGRstep()<CR> 
 amenu &Debugger.StepOut\      :call DBGRstepout()<CR> 
 amenu &Debugger.Continue\     :call DBGRcont()<CR> 
+amenu &Debugger.ToggleAutoVariableView\   :call DBGRtoggleAutoUpdateVarsView()<CR> 
 amenu &Debugger.ToggleStackTrace\   :call DBGRtoggleStackTraceView()<CR> 
 amenu &Debugger.FoldingVariables\   :call DBGRtoggleFoldingVarView()<CR> 
 amenu &Debugger.Restart\      :call DBGRrestart()<CR> 
