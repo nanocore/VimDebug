@@ -109,6 +109,7 @@ amenu &Debugger.Next\         :call DBGRnext()<CR>
 amenu &Debugger.Step\         :call DBGRstep()<CR> 
 amenu &Debugger.StepOut\      :call DBGRstepout()<CR> 
 amenu &Debugger.Continue\     :call DBGRcont()<CR> 
+amenu &Debugger.ShowVariables\   :call DBGRupdateVarView()<CR> 
 amenu &Debugger.ToggleAutoVariableView\   :call DBGRtoggleAutoUpdateVarsView()<CR> 
 amenu &Debugger.ToggleStackTrace\   :call DBGRtoggleStackTraceView()<CR> 
 amenu &Debugger.FoldingVariables\   :call DBGRtoggleFoldingVarView()<CR> 
