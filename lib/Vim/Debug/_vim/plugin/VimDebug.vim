@@ -425,6 +425,13 @@ function! DBGRrestart()
    call s:UnplaceTheLastCurrentLineSign()
    redraw!
    call s:HandleCmdResult("restarted")
+
+   " need to go back to the orignal file if not already on it
+   let l:bufNr = bufnr(s:initialDebuggedFileName)
+   if bufexists(l:bufNr) != 0
+       exec "buffer " . l:bufNr
+   endif
+
    let s:programDone = 0
 endfunction
 function! DBGRquit()
