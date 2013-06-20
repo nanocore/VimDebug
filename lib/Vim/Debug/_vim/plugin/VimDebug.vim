@@ -18,6 +18,7 @@ map <unique> <F8>          :DBGRnext<CR>
 map <unique> <F9>          :DBGRcont<CR>                   " continue
 map <unique> <Leader>b     :DBGRsetBreakPoint<CR>
 map <unique> <Leader>be    :exec 'tabedit ' . g:DBGRgeneralBreakPointsFile<CR>
+map <unique> <Leader>d     :DBGRbeginDebuggerFromText<CR>
 map <unique> <Leader>v     :DBGRupdateVarView<CR>
 map <unique> <Leader>V     :DBGRtoggleAutoUpdateVarsView<CR>
 map <unique> <Leader>s     :DBGRtoggleStackTraceView<CR>
@@ -32,6 +33,7 @@ map <unique> <F11>         :DBGRquit<CR>
 " commands
 command! -nargs=* DBGRstart                    call DBGRstart("<args>")
 command! -nargs=0 DBGRbeginDebugger            call DBGRbeginDebugger()
+command! -nargs=0 DBGRbeginDebuggerFromText    call DBGRbeginDebuggerFromText()
 command! -nargs=0 DBGRstepout                  call DBGRstepout()
 command! -nargs=0 DBGRstep                     call DBGRstep()
 command! -nargs=0 DBGRnext                     call DBGRnext()
@@ -163,6 +165,15 @@ function! DBGRbeginDebugger()
       let g:DBGRdebugArgs = input("Enter arguments for debugging: ", g:DBGRdebugArgs)
       call inputrestore()
    endif
+   " call the debugger with arguments 
+   call DBGRstart(g:DBGRdebugArgs)
+endfunction
+" this method will take the line udner the cursor as the command line 
+" arguments
+function! DBGRbeginDebuggerFromText()
+   " now remove any white space or pound signs (in case it is commented out)
+   " from the beginnin of the text
+   let g:DBGRdebugArgs = matchstr(getline("."), '\s*#\{}\s*\zs.\{}\ze$')
    " call the debugger with arguments 
    call DBGRstart(g:DBGRdebugArgs)
 endfunction
