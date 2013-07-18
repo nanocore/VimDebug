@@ -17,8 +17,8 @@ map <unique> <F7>          :DBGRstep<CR>
 map <unique> <F8>          :DBGRnext<CR>
 map <unique> <F9>          :DBGRcont<CR>                   " continue
 map <unique> <Leader>b     :DBGRsetBreakPoint<CR>
-map <unique> <Leader>be    :exec 'tabedit ' . g:DBGRgeneralBreakPointsFile<CR>
-map <unique> <Leader>d     :DBGRbeginDebuggerFromText<CR>
+map <unique> <Leader>d     :DBGRbeginDebuggerFromText<CR> " using the line under the cusor as the arguments
+map <unique> <Leader>be    :DBGReditBreakPointsFile<CR>
 map <unique> <Leader>v     :DBGRupdateVarView<CR>
 map <unique> <Leader>V     :DBGRtoggleAutoUpdateVarsView<CR>
 map <unique> <Leader>s     :DBGRtoggleStackTraceView<CR>
@@ -40,6 +40,7 @@ command! -nargs=0 DBGRnext                     call DBGRnext()
 command! -nargs=0 DBGRcont                     call DBGRcont()
 command! -nargs=0 DBGRsetBreakPoint            call DBGRsetBreakPoint()
 command! -nargs=0 DBGRupdateVarView            call DBGRupdateVarView()
+command! -nargs=0 DBGReditBreakPointsFile      call DBGReditBreakPointsFile()
 command! -nargs=0 DBGRtoggleStackTraceView     call DBGRtoggleStackTraceView()
 command! -nargs=0 DBGRtoggleFoldingVarView     call DBGRtoggleFoldingVarView()
 command! -nargs=0 DBGRtoggleAutoUpdateVarsView call DBGRtoggleAutoUpdateVarsView()
@@ -49,6 +50,7 @@ command! -nargs=1 DBGRprintExpand              call DBGRprint(<args>)
 command! -nargs=1 DBGRcommand                  call DBGRcommand("<args>")
 command! -nargs=0 DBGRrestart                  call DBGRrestart()
 command! -nargs=0 DBGRquit                     call DBGRquit()
+command! -nargs=0 DBGROpenFileAtDebugBreakPointsLine call DBGROpenFileAtDebugBreakPointsLine()
 
 " colors
 hi currentLine term=reverse cterm=reverse gui=reverse
@@ -100,6 +102,7 @@ if !exists("g:DBGRgeneralBreakPointsFile")
 endif 
 
 let s:initialDebuggedFileName = ""
+let g:breakPointFileOpenBufName = ""
 
 
 perl $DBGRsocket1               = 0;
@@ -168,11 +171,11 @@ function! DBGRbeginDebugger()
    " call the debugger with arguments 
    call DBGRstart(g:DBGRdebugArgs)
 endfunction
-" this method will take the line udner the cursor as the command line 
-" arguments
+" this method will take the line under the cursor as the command line
+" arguments 
 function! DBGRbeginDebuggerFromText()
-   " now remove any white space or pound signs (in case it is commented out)
-   " from the beginnin of the text
+   " now remove any white space or pound sign (in case it is commented out)
+   " from the beginning of the text
    let g:DBGRdebugArgs = matchstr(getline("."), '\s*#\{}\s*\zs.\{}\ze$')
    " call the debugger with arguments 
    call DBGRstart(g:DBGRdebugArgs)
@@ -331,7 +334,7 @@ function! DBGRloadBreakPoints()
       for l:aLine in s:breakPointItems 
          let l:items = split(l:aLine, ":")
          if l:items[0] =~ '^#'
-             continue
+            continue
          endif
          " make sure the file exists before registering the breakpoint
          if filereadable(l:items[0])
@@ -440,10 +443,10 @@ function! DBGRrestart()
    redraw!
    call s:HandleCmdResult("restarted")
 
-   " need to go back to the orignal file if not already on it
+   " need to go back to the orignal file if not on it.
    let l:bufNr = bufnr(s:initialDebuggedFileName)
    if bufexists(l:bufNr) != 0
-       exec "buffer " . l:bufNr
+      exec "buffer " . l:bufNr
    endif
 
    let s:programDone = 0
@@ -641,6 +644,10 @@ function! DBGRtoggleStackTraceView()
       let g:DBGRshowStackTraceView = 1
       call DBGRupdateStackTraceView()
     endif
+endfunction
+function! DBGReditBreakPointsFile()
+   exe "edit " .  g:DBGRgeneralBreakPointsFile
+   nnoremap <buffer> <localleader>o     :DBGROpenFileAtDebugBreakPointsLine<CR>
 endfunction
 function! DBGRtoggleAutoUpdateVarsView()
    if g:DBGRautoUpdateVarView == 1
@@ -905,6 +912,63 @@ function! s:StackTraceViewPrint(msg)
    "   let @x = l:oldValue
    normal gg
    wincmd p
+endfunction
+
+" breakpoint View functions
+function! DBGROpenFileAtDebugBreakPointsLine()
+   " first lets make sure we are in the breakpoints file
+   let l:winName = bufname('%')
+   if l:winName != g:DBGRgeneralBreakPointsFile
+      echom "This is not the vimDBGR breakpoints file"
+      sleep 2
+      return
+   endif
+
+   " now get the line under the cursor
+   let l:breakPointLine = getline(".")
+   let l:items = split(l:breakPointLine, ":")
+
+   " ignore the pound sign at the beginning of the line if it is there
+   if l:items[0] =~ '^#'
+      let l:items[0] = matchstr(l:items[0], '\s*#\{}\s*\zs.\{}\ze$')
+   endif
+
+   " now check to see if the file exists
+   if filereadable(l:items[0])
+
+      " yes it did so lets see if we have already
+      " been through this once before and there is a buffer already
+      let l:createBuffer = 0
+      if g:breakPointFileOpenBufName == ""
+         " this is just a step to not allow the buffer to be checked
+         " since this is ther first time through
+         let l:firstTimeThrough = 1
+      else
+         " so lets search for the buffer that we had before
+         let l:searchBuf = g:breakPointFileOpenBufName . "$"
+         let l:bufferNumber = bufnr(l:searchBuf)
+
+         " if its there then close it
+         if l:bufferNumber >= 0
+            wincmd j
+            exe ":q"
+         endif
+      endif
+
+      " split the screen and show the file in the bottom view 
+      " at the line given in the breakpoints file
+      exe "below sview " . l:items[0]
+      exe ":set nu"
+      exe ":" . l:items[1]
+      " set the necessary options in case the person closes this
+      " bottom screen and it cleans up the buffer list so that
+      " we can do the correct thing the next time through this
+      " code.
+      setlocal bufhidden=wipe noswapfile buftype=nowrite
+      let g:breakPointFileOpenBufName = bufname("%")
+   else
+      echom "File: " . l:items[0] . " IS NOT FOUND"
+   endif
 endfunction
 
 " socket functions
