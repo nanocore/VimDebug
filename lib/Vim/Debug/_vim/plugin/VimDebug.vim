@@ -330,6 +330,9 @@ function! DBGRloadBreakPoints()
       let s:breakPointItems = readfile(g:DBGRgeneralBreakPointsFile)
       for l:aLine in s:breakPointItems 
          let l:items = split(l:aLine, ":")
+         if l:items[0] =~ '^#'
+             continue
+         endif
          " make sure the file exists before registering the breakpoint
          if filereadable(l:items[0])
             " add the break point to the list that is being tracked
